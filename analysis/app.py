@@ -3,49 +3,44 @@ import requests
 
 app = Flask(__name__)
 
-# Your API key
-API_KEY = '6KTR8DTNQ69W9ZF5'
-BASE_URL = 'https://www.alphavantage.co/query'
+# Your API Key
+API_KEY = "cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/search', methods=['POST'])
-def search():
-    stock_symbol = request.form['stock_symbol']
-    if stock_symbol:
-        response = get_stock_data(stock_symbol)
-        if response:
-            return render_template('stock.html', data=response, stock_symbol=stock_symbol)
-        else:
-            return render_template('stock.html', error="Stock not found!", stock_symbol=stock_symbol)
-    return render_template('index.html', error="Please enter a stock symbol.")
-
-def get_stock_data(symbol):
-    params = {
-        'function': 'TIME_SERIES_DAILY',
-        'symbol': symbol,
-        'apikey': API_KEY
-    }
-    response = requests.get(BASE_URL, params=params)
+# Home Route - Fetch Top 20 Biggest Gainers
+@app.route("/")
+def home():
+    gainers_url = f"https://financialmodelingprep.com/api/v3/stock_market/gainers?apikey={API_KEY}"
+    response = requests.get(gainers_url)
+    
     if response.status_code == 200:
-        data = response.json()
-        if 'Time Series (Daily)' in data:
-            timeseries = data['Time Series (Daily)']
-            dates = list(timeseries.keys())
-            latest_date = dates[0]
-            latest_data = timeseries[latest_date]
-            return {
-                'symbol': symbol,
-                'latest_date': latest_date,
-                'latest_close': latest_data['4. close'],
-                'latest_open': latest_data['1. open'],
-            }
-    return None
+        gainers = response.json()[:20]  # Top 20 gainers
+    else:
+        gainers = []
+    
+    return render_template("index.html", gainers=gainers)
+
+# Search Route - Fetch News for a Specific Stock
+@app.route("/search", methods=["POST"])
+def search():
+    stock = request.form.get("stock")  # Get stock input from search bar
+    
+    # Fetch news for the entered stock
+    news_url = f"https://financialmodelingprep.com/api/v3/stock_news?tickers={stock}&limit=10&apikey={API_KEY}"
+    response = requests.get(news_url)
+    
+    if response.status_code == 200:
+        news = response.json()  # Get top 10 news articles
+    else:
+        news = []
+    
+    return render_template("stock.html", stock=stock.upper(), news=news)
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
 
 
 
