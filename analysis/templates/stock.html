@@ -3,61 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Insights</title>
+    <title>Stock Search Results</title>
     <style>
         body {
             background-color: black;
             color: white;
             font-family: Arial, sans-serif;
-        }
-        .container {
             text-align: center;
-            margin-top: 50px;
         }
-        .news {
-            margin-top: 30px;
-            padding: 20px;
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
             border: 1px solid white;
+            padding: 10px;
+            text-align: center;
         }
-        .news article {
-            margin-bottom: 10px;
+        th {
+            background-color: #333;
         }
-        .news a {
-            color: lightblue;
-            text-decoration: none;
+        .search-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
         }
-        .news a:hover {
-            text-decoration: underline;
+        .search-bar:focus {
+            outline: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Stock Insights for {{ stock_symbol }}</h1>
-        {% if data %}
-            <p>Latest Date: {{ data.latest_date }}</p>
-            <p>Open Price: ${{ data.latest_open }}</p>
-            <p>Close Price: ${{ data.latest_close }}</p>
-        {% endif %}
-        {% if error %}
-            <p style="color:red;">{{ error }}</p>
-        {% endif %}
-        <div class="news">
-            <h2>Trending News</h2>
-            {% if news %}
-                {% for article in news %}
-                    <article>
-                        <h3><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h3>
-                        <p>{{ article.description }}</p>
-                    </article>
-                {% endfor %}
-            {% else %}
-                <p>No news available for this stock.</p>
-            {% endif %}
-        </div>
-    </div>
+    <h1>Stock Search Results</h1>
+    
+    <!-- Search Form -->
+    <form action="/search" method="POST">
+        <input type="text" name="ticker" placeholder="Enter Stock Ticker" class="search-bar" required>
+        <button type="submit" class="search-bar">Search</button>
+    </form>
+
+    <!-- Display Stock Info -->
+    {% if stock_data %}
+    <h2>Stock Info for {{ stock_data['symbol'] }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Current Price</th>
+                <th>Opening Price</th>
+                <th>Closing Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${{ stock_data['price'] }}</td>
+                <td>${{ stock_data['dayLow'] }}</td>
+                <td>${{ stock_data['dayHigh'] }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Display News Articles -->
+    <h2>Trending News for {{ stock_data['symbol'] }}</h2>
+    <ul>
+        {% for article in news_data %}
+        <li>
+            <a href="{{ article['url'] }}" target="_blank">{{ article['title'] }}</a>
+            <p>{{ article['publishedDate'] }} - {{ article['source'] }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No stock information available. Please try again with a valid ticker.</p>
+    {% endif %}
 </body>
 </html>
+
+
+
 
 
 

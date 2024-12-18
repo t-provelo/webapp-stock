@@ -24,10 +24,35 @@
         th {
             background-color: #333;
         }
+        .search-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .search-bar:focus {
+            outline: none;
+        }
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            margin-right: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Top 20 Gaining Stocks</h1>
+    <form action="/search" method="POST">
+        <input type="text" name="ticker" placeholder="Enter Stock Ticker" class="search-bar" required>
+        <button type="submit" class="search-bar">Search</button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -50,8 +75,39 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% if stock_data %}
+    <h2>Stock Info for {{ stock_data['symbol'] }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Current Price</th>
+                <th>Opening Price</th>
+                <th>Closing Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${{ stock_data['price'] }}</td>
+                <td>${{ stock_data['dayLow'] }}</td>
+                <td>${{ stock_data['dayHigh'] }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Trending News for {{ stock_data['symbol'] }}</h2>
+    <ul>
+        {% for article in news_data %}
+        <li>
+            <a href="{{ article['url'] }}" target="_blank">{{ article['title'] }}</a>
+            <p>{{ article['publishedDate'] }} - {{ article['source'] }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 </body>
 </html>
+
 
 
 
