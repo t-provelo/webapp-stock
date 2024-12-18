@@ -1,19 +1,28 @@
+from flask import Flask, render_template
 import requests
 
-api_url = "https://financialmodelingprep.com/api/v3/gainers?apikey=cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
-response = requests.get(api_url)
+app = Flask(__name__)
 
-# Add detailed debugging
-print(f"Request URL: {api_url}")
-print(f"Response Status Code: {response.status_code}")
+@app.route('/')
+def index():
+    api_url = "https://financialmodelingprep.com/api/v3/gainers?apikey=cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
+    response = requests.get(api_url)
+    
+    if response.status_code == 200:
+        gainers = response.json()  # Extract the data from the response
+        print(f"Number of gainers fetched: {len(gainers)}")  # Check how many gainers were fetched
+        # Return the HTML page, passing the gainers data to the template
+        return render_template('index.html', gainers=gainers)
+    else:
+        print("Failed to fetch data from API.")
+        return render_template('index.html', gainers=[])
 
-if response.status_code == 200:
-    data = response.json()
-    print(f"Number of gainers fetched: {len(data)}")
-    for gainer in data[:20]:  # Print the first 20 gainers
-        print(gainer)
-else:
-    print("Failed to fetch data from API. Response:", response.text)
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
 
 
 
