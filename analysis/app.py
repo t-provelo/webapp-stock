@@ -3,19 +3,26 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    # Fetch the top 20 gainers
-    api_url = "https://financialmodelingprep.com/api/v3/gainers?apikey=cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
+    # Default to showing top gainers
+    filter_type = request.form.get('filter_type', 'gainers')  # Default is gainers
+    
+    # Determine which API URL to use based on the filter
+    if filter_type == 'gainers':
+        api_url = "https://financialmodelingprep.com/api/v3/gainers?apikey=cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
+    else:  # 'losers' filter
+        api_url = "https://financialmodelingprep.com/api/v3/losers?apikey=cEIQ6q3OnK0zxQCJqnCeRjSLIVGsyEwx"
+    
     response = requests.get(api_url)
     
     if response.status_code == 200:
-        gainers_data = response.json()
-        top_20_gainers = gainers_data[:20]  # Only take the first 20 gainers
+        market_data = response.json()
+        top_20_stocks = market_data[:20]  # Only take the first 20
     else:
-        top_20_gainers = []
+        top_20_stocks = []
     
-    return render_template('stock.html', gainers=top_20_gainers)
+    return render_template('stock.html', stocks=top_20_stocks, filter_type=filter_type)
 
 
 @app.route('/search', methods=['POST'])
@@ -54,6 +61,7 @@ def search():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
