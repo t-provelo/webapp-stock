@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Search Results</title>
+    <title>Stock Market Analysis</title>
     <style>
         body {
             background-color: black;
@@ -25,65 +25,77 @@
             background-color: #333;
         }
         .search-bar {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px;
-            background-color: white;
-            color: black;
-            border: none;
-            border-radius: 5px;
+            text-align: right;
+            margin: 10px 50px;
+        }
+        input[type="text"] {
+            padding: 5px;
             font-size: 16px;
         }
-        .search-bar:focus {
-            outline: none;
+        .stock-info {
+            margin: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Stock Search Results</h1>
-    
-    <!-- Search Form -->
-    <form action="/search" method="POST">
-        <input type="text" name="ticker" placeholder="Enter Stock Ticker" class="search-bar" required>
-        <button type="submit" class="search-bar">Search</button>
+    <h1>Top 20 Gaining Stocks</h1>
+    <form class="search-bar" action="/search" method="POST">
+        <input type="text" name="stock_symbol" placeholder="Search stock (e.g., AAPL)" required>
+        <button type="submit">Search</button>
     </form>
 
-    <!-- Display Stock Info -->
-    {% if stock_data %}
-    <h2>Stock Info for {{ stock_data['symbol'] }}</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Current Price</th>
-                <th>Opening Price</th>
-                <th>Closing Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>${{ stock_data['price'] }}</td>
-                <td>${{ stock_data['dayLow'] }}</td>
-                <td>${{ stock_data['dayHigh'] }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Display News Articles -->
-    <h2>Trending News for {{ stock_data['symbol'] }}</h2>
-    <ul>
-        {% for article in news_data %}
-        <li>
-            <a href="{{ article['url'] }}" target="_blank">{{ article['title'] }}</a>
-            <p>{{ article['publishedDate'] }} - {{ article['source'] }}</p>
-        </li>
-        {% endfor %}
-    </ul>
+    {% if gainers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Company Name</th>
+                    <th>Price</th>
+                    <th>Change</th>
+                    <th>Change Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gainer in gainers %}
+                <tr>
+                    <td>{{ gainer.ticker }}</td>
+                    <td>{{ gainer.companyName }}</td>
+                    <td>${{ gainer.price }}</td>
+                    <td>{{ gainer.changes }}</td>
+                    <td>{{ gainer.changesPercentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-        <p>No stock information available. Please try again with a valid ticker.</p>
+        <p>No gainers data available at the moment.</p>
+    {% endif %}
+
+    {% if stock_data %}
+        <div class="stock-info">
+            <h2>Stock Information for {{ stock_data.companyName }}</h2>
+            <p>Current Price: ${{ current_price }}</p>
+            <p>Opening Price: ${{ open_price }}</p>
+            <p>Closing Price: ${{ close_price }}</p>
+
+            <h3>Trending News:</h3>
+            {% if news_data %}
+                <ul>
+                    {% for article in news_data %}
+                    <li>
+                        <a href="{{ article.url }}" target="_blank">{{ article.title }}</a>
+                        <p>{{ article.publishedDate }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No news available for this stock.</p>
+            {% endif %}
+        </div>
     {% endif %}
 </body>
 </html>
+
 
 
 
