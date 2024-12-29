@@ -1,2 +1,2 @@
 # stock-market-analysis
- Build a stock market analysis tool that collects real-time stock data, processes it to generate insights (e.g., moving averages, price trends), stores it in a database, and provides a front-end interface for users to explore and visualize the data.
+A dynamic web application that enables users to explore market trends, view stock data, and filter top-performing and underperforming stocks, showcasing expertise in full-stack development and API integration.
